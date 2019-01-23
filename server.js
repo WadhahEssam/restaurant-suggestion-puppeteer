@@ -17,13 +17,18 @@ app.get('/', (req, res) => {
 });
 
 app.post('/getInformation', async (req, res) => {
-  let data = await getData(req.body.lat, req.body.long);
-  res.send(data);
+  try {
+    let data = await getData(req.body.lat, req.body.long);
+    res.send(data);
+  } catch(err) {
+    console.log(err.message);
+    res.send('Somthing Wrong Happened');
+  }
 })
 
 getData = async (lat, long) => {
   console.log(`lat : ${lat} / long ${long}`);
-  const browser = await puppeteer.launch({headless: true});
+  const browser = await puppeteer.launch({headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox']});
   const page = await browser.newPage();
   await page.setViewport({height: 1080, width: 1920});
   await page.goto(`https://wainnakel.com/api/v1/GenerateFS.php?uid=${lat},${long}&get_param=value`);
